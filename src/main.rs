@@ -2,8 +2,10 @@ use mcmc::{acceptance, gaussian_sample};
 use rand::Rng;
 
 pub fn main() {
-    /* CAUTION these initial project assumes
+    /* CAUTION project assumes
      * the PDF provided is proportional to the Gaussian Distribution!!
+     * WIP for other symmetrical distributions. Not going to worry about
+     * assymetrical.
      */
     let mut position = gaussian_sample();
     let samples: i32 = 20;

@@ -1,11 +1,7 @@
 use crate::gaussian;
 
-use iced::widget::canvas::{self, stroke, Cache, LineCap, Stroke, Style};
-use iced::widget::Canvas;
-use iced::Color;
-use iced::Theme;
-use iced::{Element, Length, Point, Renderer, Size};
-
+use iced::widget::canvas::{self, stroke, Cache, Stroke};
+use iced::{Color, Point, Theme};
 
 pub struct BellCurve {
     mu: f64,
@@ -20,7 +16,7 @@ impl BellCurve {
         Self {
             mu: 2.0,
             sigma: 0.2,
-            position: Point {x: 0.0, y: 0.0},
+            position: Point { x: 0.0, y: 0.0 },
             curve_cache: canvas::Cache::default(),
             position_cache: canvas::Cache::default(),
         }
@@ -37,15 +33,13 @@ impl BellCurve {
     }
 
     pub fn redraw(&mut self) {
-      self.position_cache.clear();
+        self.position_cache.clear();
     }
-
 
     fn value_at(&self, x: f64) -> f64 {
         gaussian::distribution_density(self.mu, self.sigma, x)
     }
 }
-
 
 impl<Message> canvas::Program<Message> for BellCurve {
     type State = ();
@@ -57,10 +51,7 @@ impl<Message> canvas::Program<Message> for BellCurve {
         bounds: iced::Rectangle,
         _cursor: canvas::Cursor,
     ) -> Vec<canvas::Geometry> {
-
         let geom = self.curve_cache.draw(bounds.size(), |frame| {
-
-
             let divisor = 50.0 / self.mu as f32;
             let mut current_point = Point { x: 0.0, y: 0.0 };
             for i in 0..100 {
@@ -69,6 +60,9 @@ impl<Message> canvas::Program<Message> for BellCurve {
                     x: i * 10.0,
                     y: self.value_at((i as f64) / (divisor as f64)) as f32 * 100.0,
                 };
+                if i as i32 == 50 {
+                    println!("50: x:{} y:{}", next_point.x, next_point.y);
+                }
                 frame.stroke(
                     &canvas::Path::new(|path| {
                         path.move_to(current_point);
@@ -87,8 +81,8 @@ impl<Message> canvas::Program<Message> for BellCurve {
             }
         });
         let pos = self.position_cache.draw(bounds.size(), |frame| {
-          let path = canvas::Path::circle(self.position, 5.0);
-          frame.fill(&path, Color::from_rgb8(0x12, 0x93, 0xD8));
+            let path = canvas::Path::circle(self.position, 5.0);
+            frame.fill(&path, Color::from_rgb8(0x12, 0x93, 0xD8));
         });
         vec![geom, pos]
     }

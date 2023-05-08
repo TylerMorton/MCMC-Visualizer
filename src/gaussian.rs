@@ -18,3 +18,10 @@ pub fn sample() -> f64 {
     let v = normal.sample(&mut rand::thread_rng());
     v
 }
+
+pub fn sample_custom(mean: f64, dev: f64) -> f64 {
+    let normal = Normal::new(mean, dev).unwrap();
+    let v = normal.sample(&mut rand::thread_rng());
+    v
+}
+

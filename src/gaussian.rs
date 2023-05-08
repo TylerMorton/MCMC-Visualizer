@@ -14,7 +14,7 @@ pub fn distribution_density(mean: f64, stddev: f64, state: f64) -> f64 {
 }
 
 pub fn sample() -> f64 {
-    let normal = Normal::new(2.0, 3.0).unwrap();
+    let normal = Normal::new(2.0, 0.2).unwrap();
     let v = normal.sample(&mut rand::thread_rng());
     v
 }

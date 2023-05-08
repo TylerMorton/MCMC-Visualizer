@@ -1,6 +1,8 @@
 pub mod bellcurve;
 pub mod gaussian;
 pub mod metropolis;
+pub mod stage;
+
 
 #[cfg(test)]
 mod tests {

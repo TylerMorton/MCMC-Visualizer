@@ -10,6 +10,7 @@ use iced::{
 
 use iced::{time, Renderer};
 use mcmc::gaussian;
+use mcmc::stage::Stage;
 //use plotters_iced::{Chart, ChartBuilder, ChartWidget, DrawingBackend};
 use std::time::{Duration, Instant};
 
@@ -27,7 +28,9 @@ struct MetropolisVisualizer {
     value: i32,
     is_playing: bool,
     speed: i32,
-    graph: CircleGraph,
+    stage: Stage,
+    now: Instant,
+    //graph: CircleGraph,
     curve: BellCurve,
 }
 
@@ -65,7 +68,6 @@ impl canvas::Program<Message> for CircleGraph {
         cursor: canvas::Cursor,
     ) -> Vec<canvas::Geometry> {
         let mut dist: Vec<canvas::Geometry> = Vec::new();
-        println!("drawing");
         let geom = self.cache.draw(bounds.size(), |frame| {
             frame.stroke(
                 &canvas::Path::rectangle(Point::ORIGIN, frame.size()),
@@ -100,6 +102,7 @@ pub enum Message {
     PointAdded(Point),
     Run(Instant),
     Toggle,
+    Reset,
 }
 
 impl Application for MetropolisVisualizer {
@@ -110,8 +113,10 @@ impl Application for MetropolisVisualizer {
 
     fn new(_flags: Self::Flags) -> (Self, iced::Command<Self::Message>) {
         let emulator = MetropolisVisualizer {
-            graph: CircleGraph::new(),
+            //graph: CircleGraph::new(),
+            stage: Stage::default(),
             curve: BellCurve::default(),
+            now: Instant::now(),
             value: 0,
             is_playing: false,
             speed: 100,
@@ -125,40 +130,47 @@ impl Application for MetropolisVisualizer {
 
     fn update(&mut self, message: Self::Message) -> iced::Command<Self::Message> {
         let divisor = 50.0 / 2.0;
-        let x64 = self.graph.point.x as f64;
-        println!("{} {}", self.graph.point.x + 1.0, gaussian::distribution_density(2.0, 0.2, (x64 / 10.0) / divisor) + 100.0);
         match message {
             Message::Toggle => {
                 self.is_playing = !self.is_playing;
             }
             Message::Run(_) => {
-                let x64 = self.graph.point.x as f64;
-                println!(
-                    "x: {} y: {}",
-                    self.graph.point.x + 1.0,
-                    gaussian::distribution_density(2.0, 0.2, x64 /  2.0) + 100.0
-                );
-                self.graph.point = Point {
-                    x: self.graph.point.x + 1.0,
-                    y: (gaussian::distribution_density(2.0, 0.4, (x64 / 10.0) / divisor) * 100.0 + 100.0)
-                        as f32,
+                if self.now.elapsed().as_secs() >= 1 {
+                    self.now = Instant::now();
+                self.stage.position = Point {
+                    x: gaussian::sample() as f32  * 200.0,
+                    y: 5.0,
+                };
+                }
+                let x64 = self.curve.position.x as f64;
+                self.curve.position = Point {
+                    x: self.curve.position.x + 1.0,
+                    y: (gaussian::distribution_density(2.0, 0.2, (x64 / 10.0) / divisor) * 100.0)
+                        as f32 + 5.0,
                 };
             }
             Message::PointAdded(point) => {
-                self.graph.point = point;
+            }
+            Message::Reset => {
+                self.curve.position = Point {x: 0.0, y: 0.0};
+                self.stage.position = Point {x: 0.0, y: 0.0};
             }
         }
-        self.graph.redraw();
+        self.stage.redraw();
+        self.curve.redraw();
         return Command::none();
     }
 
     fn view(&self) -> Element<'_, Self::Message, Renderer<Self::Theme>> {
         column![
+            row![
             button("Toggle").on_press(Message::Toggle),
+            button("Reset").on_press(Message::Reset),
+            ],
             Canvas::new(&self.curve)
                 .height(Length::Fill)
                 .width(Length::Fill),
-            Canvas::new(&self.graph)
+            Canvas::new(&self.stage)
             .height(Length::Fill)
             .width(Length::Fill)
         ]

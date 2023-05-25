@@ -4,12 +4,13 @@
 use crate::gaussian;
 
 use iced::widget::canvas::{self, stroke, Cache, Stroke};
-use iced::{Color, Point, Theme };
+use iced::{Color, Point, Theme};
 
 pub struct Stage {
-    mu: f64, // may be needed soon...
+    mu: f64,    // may be needed soon...
     sigma: f64, // may be needed soon...
     pub position: Point,
+    pub candidate_position: Point,
     line_cache: Cache,
     position_cache: Cache,
 }
@@ -19,7 +20,14 @@ impl Stage {
         Self {
             mu: 2.0,
             sigma: 0.2,
-            position: Point { x: gaussian::sample_custom(2.0, 0.2) as f32 * 250.0, y: 0.0 },
+            position: Point {
+                x: gaussian::sample_custom(2.0, 0.2) as f32 * 250.0,
+                y: 0.0,
+            },
+            candidate_position: Point {
+                x: gaussian::sample_custom(2.0, 0.2) as f32 * 250.0,
+                y: 0.0,
+            },
             line_cache: canvas::Cache::default(),
             position_cache: canvas::Cache::default(),
         }
@@ -30,6 +38,7 @@ impl Stage {
             mu,
             sigma,
             position: Point { x: 0.0, y: 0.0 },
+            candidate_position: Point { x: 0.0, y: 0.0 },
             line_cache: canvas::Cache::default(),
             position_cache: canvas::Cache::default(),
         }
@@ -69,6 +78,8 @@ impl<Message> canvas::Program<Message> for Stage {
         });
 
         let pos = self.position_cache.draw(bounds.size(), |frame| {
+            let path: canvas::Path = canvas::Path::circle(self.candidate_position, 10.0);
+            frame.fill(&path, Color::from_rgb8(0xe7, 0x6f, 0x51));
             let path: canvas::Path = canvas::Path::circle(self.position, 5.0);
             frame.fill(&path, Color::from_rgb8(0x12, 0x93, 0xD8));
         });

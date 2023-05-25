@@ -24,4 +24,3 @@ pub fn sample_custom(mean: f64, dev: f64) -> f64 {
     let v = normal.sample(&mut rand::thread_rng());
     v
 }
-

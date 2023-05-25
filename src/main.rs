@@ -9,6 +9,9 @@ use mcmc::gaussian;
 use mcmc::metropolis;
 use mcmc::stage::Stage;
 
+const MEAN: f64 = 2.0;
+const STDDEV: f64 = 0.7;
+
 pub fn main() -> iced::Result {
     MetropolisVisualizer::run(Settings {
         antialiasing: true,
@@ -40,7 +43,7 @@ impl Application for MetropolisVisualizer {
     fn new(_flags: Self::Flags) -> (Self, iced::Command<Self::Message>) {
         let emulator = MetropolisVisualizer {
             stage: Stage::default(),
-            curve: BellCurve::default(),
+            curve: BellCurve::new(MEAN, STDDEV),
             now: Instant::now(),
             is_playing: false,
             speed: 100,
@@ -63,10 +66,23 @@ impl Application for MetropolisVisualizer {
                 self.stage.position = Point { x: 0.0, y: 0.0 };
             }
             Message::Run(_) => {
-                if self.now.elapsed().as_millis() >= 50 {
+                let pos = self.stage.position.x / 10.0 / divisor;
+                if self.now.elapsed().as_millis() >= 1000 {
                     self.now = Instant::now();
+                    let candidate = metropolis::derive_candidate(MEAN, STDDEV, pos as f64);
+                    self.stage.candidate_position = Point {
+                        x: candidate.value as f32 * 10.0 * divisor as f32,
+                        y: 5.0,
+                    };
                     self.stage.position = Point {
-                        x: metropolis::metropolis_state(10.0, self.stage.position.x as f64) as f32,
+                        x: metropolis::metropolis_state(
+                            MEAN,
+                            STDDEV,
+                            self.stage.position.x as f64 / 10.0 / divisor as f64,
+                            candidate,
+                        ) as f32
+                            * 10.0
+                            * divisor as f32,
                         //x: gaussian::sample() as f32 * 250.0,
                         y: 5.0,
                     };
@@ -74,8 +90,8 @@ impl Application for MetropolisVisualizer {
                 let x64 = self.curve.position.x as f64;
                 self.curve.position = Point {
                     x: self.curve.position.x + 1.0,
-                    y: (gaussian::distribution_density(2.0, 0.2, (x64 / 10.0) / divisor) * 100.0)
-                        as f32
+                    y: (gaussian::distribution_density(MEAN, STDDEV, (x64 / 10.0) / divisor as f64)
+                        * 100.0) as f32
                         + 5.0,
                 };
             }
@@ -112,7 +128,6 @@ impl Application for MetropolisVisualizer {
                 text_color: Color::WHITE,
             }
         }
-
         theme::Application::from(dark_background as fn(&Theme) -> _)
     }
 

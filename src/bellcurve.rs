@@ -52,7 +52,8 @@ impl<Message> canvas::Program<Message> for BellCurve {
         _cursor: canvas::Cursor,
     ) -> Vec<canvas::Geometry> {
         let geom = self.curve_cache.draw(bounds.size(), |frame| {
-            let divisor = 50.0 / self.mu as f32;
+            //let divisor = 50.0 / self.mu as f32;
+            let divisor = 50.0 / 2.0 as f32;
             let mut current_point = Point { x: 0.0, y: 0.0 };
             for i in 0..100 {
                 let i = i as f32;

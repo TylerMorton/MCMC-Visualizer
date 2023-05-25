@@ -7,19 +7,15 @@ use iced::widget::canvas::{self, stroke, Cache, Stroke};
 use iced::{Color, Point, Theme};
 
 pub struct Stage {
-    mu: f64,    // may be needed soon...
-    sigma: f64, // may be needed soon...
     pub position: Point,
     pub candidate_position: Point,
     line_cache: Cache,
     position_cache: Cache,
 }
 
-impl Stage {
-    pub fn default() -> Self {
+impl Default for Stage {
+    fn default() -> Self {
         Self {
-            mu: 2.0,
-            sigma: 0.2,
             position: Point {
                 x: gaussian::sample_custom(2.0, 0.2) as f32 * 250.0,
                 y: 0.0,
@@ -32,11 +28,11 @@ impl Stage {
             position_cache: canvas::Cache::default(),
         }
     }
+}
 
-    pub fn new(mu: f64, sigma: f64) -> Self {
+impl Stage {
+    pub fn new() -> Self {
         Self {
-            mu,
-            sigma,
             position: Point { x: 0.0, y: 0.0 },
             candidate_position: Point { x: 0.0, y: 0.0 },
             line_cache: canvas::Cache::default(),

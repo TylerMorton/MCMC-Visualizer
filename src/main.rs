@@ -71,18 +71,17 @@ impl Application for MetropolisVisualizer {
                     self.now = Instant::now();
                     let candidate = metropolis::derive_candidate(MEAN, STDDEV, pos as f64);
                     self.stage.candidate_position = Point {
-                        x: candidate.value as f32 * 10.0 * divisor as f32,
+                        x: candidate.value as f32 * 10.0 * divisor,
                         y: 5.0,
                     };
                     self.stage.position = Point {
                         x: metropolis::metropolis_state(
                             MEAN,
-                            STDDEV,
                             self.stage.position.x as f64 / 10.0 / divisor as f64,
                             candidate,
                         ) as f32
                             * 10.0
-                            * divisor as f32,
+                            * divisor,
                         //x: gaussian::sample() as f32 * 250.0,
                         y: 5.0,
                     };
@@ -98,7 +97,7 @@ impl Application for MetropolisVisualizer {
         }
         self.stage.redraw();
         self.curve.redraw();
-        return Command::none();
+        Command::none()
     }
 
     fn view(&self) -> Element<'_, Self::Message, Renderer<Self::Theme>> {

@@ -53,7 +53,7 @@ pub fn derive_candidate(mean: f64, dev: f64, position: f64) -> Candidate {
     Candidate { value, prob_accept }
 }
 
-pub fn metropolis_state(mean: f64, dev: f64, position: f64, candidate: Candidate) -> f64 {
+pub fn metropolis_state(mean: f64, position: f64, candidate: Candidate) -> f64 {
     /* CAUTION project assumes
      * the PDF provided is proportional to the Gaussian Distribution!!
      * WIP for other symmetrical distributions. Not going to worry about

@@ -7,7 +7,7 @@ use std::time::{Duration, Instant};
 use mcmc::bellcurve::BellCurve;
 use mcmc::gaussian;
 use mcmc::metropolis;
-use mcmc::stage::Stage;
+use mcmc::stage::{Player, Stage};
 
 const MEAN: f64 = 2.0;
 const STDDEV: f64 = 0.7;
@@ -63,28 +63,26 @@ impl Application for MetropolisVisualizer {
             }
             Message::Reset => {
                 self.curve.position = Point { x: 0.0, y: 0.0 };
-                self.stage.position = Point { x: 0.0, y: 0.0 };
+                self.stage.players = self.stage.players.iter().map(|_| Player::default()).collect();
             }
             Message::Run(_) => {
-                let pos = self.stage.position.x / 10.0 / divisor;
-                if self.now.elapsed().as_millis() >= 1000 {
-                    self.now = Instant::now();
-                    let candidate = metropolis::derive_candidate(MEAN, STDDEV, pos as f64);
-                    self.stage.candidate_position = Point {
-                        x: candidate.value as f32 * 10.0 * divisor,
-                        y: 5.0,
-                    };
-                    self.stage.position = Point {
-                        x: metropolis::metropolis_state(
-                            MEAN,
-                            self.stage.position.x as f64 / 10.0 / divisor as f64,
-                            candidate,
-                        ) as f32
-                            * 10.0
-                            * divisor,
-                        //x: gaussian::sample() as f32 * 250.0,
-                        y: 5.0,
-                    };
+                for player in self.stage.players.iter_mut() {
+                    let pos = player.current.x / 10.0 / divisor;
+                    if self.now.elapsed().as_millis() >= 10 {
+                        player.candidate = metropolis::derive_candidate(MEAN, STDDEV, pos as f64);
+                        player.candidate.position = Point {
+                            x: player.candidate.position.x * 10.0 * divisor,
+                            y: player.candidate.position.y,
+                        };
+                        player.current = Point {
+                            x: metropolis::metropolis_state(
+                                MEAN,
+                                player.current.x as f64,
+                                &player.candidate,
+                            )as f32,
+                            y: 5.0,
+                        };
+                    }
                 }
                 let x64 = self.curve.position.x as f64;
                 self.curve.position = Point {
@@ -93,6 +91,9 @@ impl Application for MetropolisVisualizer {
                         * 100.0) as f32
                         + 5.0,
                 };
+                if self.now.elapsed().as_millis() >= 100 {
+                    self.now = Instant::now();
+                }
             }
         }
         self.stage.redraw();

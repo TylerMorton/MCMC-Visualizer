@@ -1,10 +1,20 @@
 use crate::gaussian;
 
+use iced::Point;
 use rand::Rng;
 
 pub struct Candidate {
     prob_accept: f64,
-    pub value: f64,
+    pub position: Point,
+}
+
+impl Candidate {
+    pub fn new(prob_accept: f64, position: Point) -> Self {
+        Candidate {
+            prob_accept,
+            position,
+        }
+    }
 }
 
 pub fn acceptance(mean: f64, dev: f64, current: f64, candidate: f64) -> f64 {
@@ -47,13 +57,18 @@ pub fn metropolis() {
 }
 
 pub fn derive_candidate(mean: f64, dev: f64, position: f64) -> Candidate {
-    let value = gaussian::sample_custom(position, 0.2 /*dev*/);
-    println!("current {} candidate {}", position, value);
-    let prob_accept = acceptance(mean, dev, position, value);
-    Candidate { value, prob_accept }
+    let candidate_position = Point {
+        x: gaussian::sample_custom(position, 0.2) as f32,
+        y: 5.0,
+    };
+    let prob_accept = acceptance(mean, dev, position, candidate_position.x as f64);
+    Candidate {
+        position: candidate_position,
+        prob_accept,
+    }
 }
 
-pub fn metropolis_state(mean: f64, position: f64, candidate: Candidate) -> f64 {
+pub fn metropolis_state(mean: f64, position: f64, candidate: &Candidate) -> f64 {
     /* CAUTION project assumes
      * the PDF provided is proportional to the Gaussian Distribution!!
      * WIP for other symmetrical distributions. Not going to worry about
@@ -65,8 +80,8 @@ pub fn metropolis_state(mean: f64, position: f64, candidate: Candidate) -> f64 {
     let gen: f64 = rng.gen();
     println!("prob {} gen {}", candidate.prob_accept, gen);
     if candidate.prob_accept > gen {
-        println!("candidate: {:.2} was accepted", candidate.value);
-        return candidate.value;
+        println!("candidate: {:.2} was accepted", candidate.position.x);
+        return candidate.position.x as f64;
     }
     position
 }

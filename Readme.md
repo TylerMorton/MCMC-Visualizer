@@ -1,8 +1,9 @@
 # MCMC Visualizer
+This project was inspired by Christos Tsanikidis' [blog post](https://tchristos.com/post/mcmc/). Christos built a Monte-Carlo Markov Chain visualizer, specifically focusing on the metropolis-hastings algorithm. His program was impressive, but he didn't go into much detail about how he made it work. So, I decided to take matters into my own hands and give it a shot.
 
+My visualizer is all utilizes two Gaussian distributions that represent the X and Y dimensions. You can tweak the means and standard deviations of both distributions to see how they affect the results.
 
-This project was inspired from this [blog post](https://tchristos.com/post/mcmc/) by Christos Tsanikidis. In Christo's work he built a Monte-Carlo Markov Chain visualizer and specifically built the program for metropolis-hastings. His program was very impressive and given that there wasn't too much explanation of how he achieved the end result, I decided to give it a try myself. My visualizer only works on 2 gaussian distributions which represent the x and y dimensions. The means and standard deviations can be changed for both distributions.
-
+I hope that by sharing my version of the visualizer, I can help others understand thisalgorithm and encourage them to dive into their own experiments. It's all about learning and building on the work of others, like Christos.
 
 ## How to run
 

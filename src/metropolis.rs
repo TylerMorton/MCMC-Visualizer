@@ -20,7 +20,6 @@ impl Candidate {
 pub fn acceptance(mean: f64, dev: f64, current: f64, candidate: f64) -> f64 {
     let f_a = gaussian::distribution_density(mean, dev, candidate);
     let f_b = gaussian::distribution_density(mean, dev, current);
-    println!("densities: cur {} can {}", f_b, f_a);
     f64::min(f_a / f_b, 1.0)
 }
 
@@ -53,7 +52,6 @@ pub fn metropolis() {
 
     let mut rng = rand::thread_rng();
     for _ in 0..samples {
-        println!("current position: {}", position);
         loop {
             // hardcoded to gaussian for now (these should be custom eventually)
             let candidate = gaussian::sample();

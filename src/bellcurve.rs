@@ -61,9 +61,6 @@ impl<Message> canvas::Program<Message> for BellCurve {
                     x: i * 10.0,
                     y: self.value_at((i as f64) / (divisor)) as f32 * 100.0,
                 };
-                if i as i32 == 50 {
-                    println!("50: x:{} y:{}", next_point.x, next_point.y);
-                }
                 frame.stroke(
                     &canvas::Path::new(|path| {
                         path.move_to(current_point);

@@ -176,13 +176,13 @@ impl Application for MetropolisVisualizer {
         let y_mean_slider =
             container(slider(0..=100, slider_vals.1, Message::YMeanSliderChanged)).width(250);
         let x_stddev_slider = container(slider(
-            0..=100,
+            1..=500,
             slider_vals.2,
             Message::XStdDevSliderChanged,
         ))
         .width(250);
         let y_stddev_slider = container(slider(
-            0..=100,
+            1..=500,
             slider_vals.3,
             Message::YStdDevSliderChanged,
         ))
@@ -201,7 +201,7 @@ impl Application for MetropolisVisualizer {
             row![
                 text(format!("{}", self.stage.stddev.x)),
                 container(x_stddev_slider).width(Length::Fill).center_x(),
-                text(format!("{}", self.stage.mean.y)),
+                text(format!("{}", self.stage.stddev.y)),
                 container(y_stddev_slider).width(Length::Fill).center_x(),
             ],
             // Canvas::new(&self.x_curve)

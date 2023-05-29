@@ -98,9 +98,6 @@ impl<Message> canvas::Program<Message> for Stage {
                     x: i * 10.0,
                     y: self.x_value_at((i as f64) / (divisor)) as f32 * 100.0,
                 };
-                if i as i32 == 50 {
-                    println!("50: x:{} y:{}", next_point.x, next_point.y);
-                }
                 frame.stroke(
                     &canvas::Path::new(|path| {
                         path.move_to(current_point);
@@ -128,9 +125,6 @@ impl<Message> canvas::Program<Message> for Stage {
                     y: i * 10.0,
                     x: self.y_value_at((i as f64) / (divisor)) as f32 * 100.0,
                 };
-                if i as i32 == 50 {
-                    println!("50: x:{} y:{}", next_point.x, next_point.y);
-                }
                 frame.stroke(
                     &canvas::Path::new(|path| {
                         path.move_to(current_point);
